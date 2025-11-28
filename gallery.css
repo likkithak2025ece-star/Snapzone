@@ -1,0 +1,51 @@
+body{
+   background-image: linear-gradient(to left,#c893fa,#ffffff);
+}
+.search-container{
+            width: 400px;
+            position: relative;
+        }
+
+        .search-box{
+            width: 100%;
+            padding: 8px 10px;
+            padding-right: 25px;
+            font-size: 16px;
+            color: #81818193;
+            border: 2px solid #6b6969;
+            border-radius: 20px;
+            outline: none;
+        }
+
+
+         .navbar{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 40px;
+            border-bottom: 2px solid #838080;
+        }
+         .menu{
+            display: flex;
+            gap: 40px;
+            font-size: 20px;
+        }
+
+        .menu a{
+            text-decoration: none;
+            color: black;
+            font-weight: 500;
+        }
+        .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap:15px;
+}
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-gap: 15px;
+}
+let reader = new FileReader();
+reader.readAsDataURL(file);
+         

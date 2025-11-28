@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head><title>UPLOAD </title></head>
+
+    <style>
+    body {
+        padding: 20px;
+        background-image: linear-gradient(to left,#ffffff,#8effca);
+    }
+    h1{
+        font-family: cursive;
+    }
+    #uploadBtn {
+        padding: 12px 25px;
+        background: #150ab8;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    #uploadBtn:hover {
+        background: #45a049;
+    }
+
+    #preview {
+        margin-top: 20px;
+        display: none;
+        width: 250px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 5px;
+    }
+.navbar{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 40px;
+            border-bottom: 2px solid #838080;
+        }
+         .menu{
+            display: flex;
+            gap: 40px;
+            font-size: 20px;
+        }
+
+        .menu a{
+            text-decoration: none;
+            color: black;
+            font-weight: 500;
+        }
+</style>
+
+</head>
+<body>
+     <div class="navbar">
+        
+        <!-- Middle -->
+        <div class="menu">
+                <a href="#">•••</a>
+            <a href="home.html">Home</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="#">Upload</a>
+            <a href="#">•••</a>
+        </div>
+     </div>
+
+<h2>Upload Your Image</h2>
+
+<input type="file" id="fileInput" accept="image/*" style="display:none;">
+
+<button id="uploadBtn">Upload Photo</button>
+
+<!-- Preview -->
+<img id="preview">
+
+<script>
+// Click → open file input
+document.getElementById("uploadBtn").onclick = () => {
+    document.getElementById("fileInput").click();
+};
+
+// When file selected → preview + save
+document.getElementById("fileInput").addEventListener("change", function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const imgData = e.target.result;
+
+        // Preview
+        document.getElementById("preview").src = imgData;
+        document.getElementById("preview").style.display = "block";
+
+        // Store in localStorage
+        let gallery = JSON.parse(localStorage.getItem("galleryImages")) || [];
+        gallery.push(imgData);
+        localStorage.setItem("galleryImages", JSON.stringify(gallery));
+
+        alert("Image saved to gallery!");
+    };
+    reader.readAsDataURL(file);
+});
+</script>
+
+
+    </body>
+</html>
