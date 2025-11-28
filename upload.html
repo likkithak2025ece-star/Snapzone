@@ -1,111 +1,191 @@
 <!DOCTYPE html>
 <html>
-    <head><title>UPLOAD </title></head>
+<head>
+    <title>UPLOAD</title>
 
-    <style>
-    body {
-        padding: 20px;
-        background-image: linear-gradient(to left,#ffffff,#8effca);
-    }
-    h1{
-        font-family: cursive;
-    }
-    #uploadBtn {
-        padding: 12px 25px;
-        background: #150ab8;
-        color: white;
-        font-size: 16px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
+<style>
+body {
+    padding: 20px;
+    background-image: linear-gradient(to left,#ffffff,#8effca);
+}
+h1{
+    font-family: cursive;
+}
 
-    #uploadBtn:hover {
-        background: #45a049;
-    }
+#uploadBtn {
+    padding: 12px 25px;
+    background: #150ab8;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.upload{
+    text-align: center;
+}
+h2{
+text-align: center;
+margin-top: 100px;
+}
 
-    #preview {
-        margin-top: 20px;
-        display: none;
-        width: 250px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        padding: 5px;
-    }
+#uploadBtn:hover {
+    background: #45a049;
+}
+
+/* Drag & Drop Box */
+#dropArea {
+    width: 100%;
+    padding: 40px;
+    border: 3px dashed #444;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 20px;
+    background: #f8f8f8;
+    transition: 0.3s;
+}
+
+#dropArea.dragover {
+    background: #d1ffd8;
+    border-color: #0a9800;
+}
+
+/* Preview gallery */
+#previewBox {
+    display: flex;
+    margin-top: 20px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.previewImg {
+    width: 180px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+
+/* Navbar */
 .navbar{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 40px;
-            border-bottom: 2px solid #838080;
-        }
-         .menu{
-            display: flex;
-            gap: 40px;
-            font-size: 20px;
-        }
-
-        .menu a{
-            text-decoration: none;
-            color: black;
-            font-weight: 500;
-        }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 40px;
+    border-bottom: 2px solid #838080;
+}
+.menu{
+    display: flex;
+    gap: 40px;
+    font-size: 20px;
+}
+.menu a{
+    text-decoration: none;
+    color: black;
+    font-weight: 500;
+}
 </style>
 
 </head>
 <body>
-     <div class="navbar">
-        
-        <!-- Middle -->
-        <div class="menu">
-                <a href="#">•••</a>
-            <a href="home.html">Home</a>
-            <a href="gallery.html">Gallery</a>
-            <a href="#">Upload</a>
-            <a href="#">•••</a>
-        </div>
-     </div>
 
+<div class="navbar">
+    <div class="menu">
+        <a href="#">•••</a>
+        <a href="home.html">Home</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="#">Upload</a>
+        <a href="#">•••</a>
+    </div>
+</div>
+
+
+
+<!-- Drag Drop Box -->
+<div id="dropArea">
+    <h3>Drag & Drop Images Here</h3>
+    <p>(or click the button above)</p>
+</div>
 <h2>Upload Your Image</h2>
-
-<input type="file" id="fileInput" accept="image/*" style="display:none;">
-
-<button id="uploadBtn">Upload Photo</button>
-
-<!-- Preview -->
-<img id="preview">
+<div class="upload">
+<button id="uploadBtn">Select Photos</button>
+<input type="file" id="fileInput" accept="image/*" multiple style="display:none;">
+</div>
+<!-- Preview before saving -->
+<div id="previewBox"></div>
 
 <script>
-// Click → open file input
+
+// Button → Open File Picker
 document.getElementById("uploadBtn").onclick = () => {
     document.getElementById("fileInput").click();
 };
 
-// When file selected → preview + save
-document.getElementById("fileInput").addEventListener("change", function () {
-    const file = this.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const imgData = e.target.result;
-
-        // Preview
-        document.getElementById("preview").src = imgData;
-        document.getElementById("preview").style.display = "block";
-
-        // Store in localStorage
-        let gallery = JSON.parse(localStorage.getItem("galleryImages")) || [];
-        gallery.push(imgData);
-        localStorage.setItem("galleryImages", JSON.stringify(gallery));
-
-        alert("Image saved to gallery!");
-    };
-    reader.readAsDataURL(file);
+// On File Selection
+document.getElementById("fileInput").addEventListener("change", (e) => {
+    handleFiles(e.target.files);
 });
+
+// Drag & Drop Events
+let dropArea = document.getElementById("dropArea");
+
+dropArea.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropArea.classList.add("dragover");
+});
+
+dropArea.addEventListener("dragleave", () => {
+    dropArea.classList.remove("dragover");
+});
+
+dropArea.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropArea.classList.remove("dragover");
+
+    let files = e.dataTransfer.files;
+    handleFiles(files);
+});
+
+// Function: Process Multiple Files
+function handleFiles(files) {
+
+    [...files].forEach(file => {
+
+        // Check file type
+        if (!file.type.startsWith("image/")) {
+            alert("Only image files allowed!");
+            return;
+        }
+
+        // Check size (limit: 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert("File too large! Max 2MB allowed.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+
+            const imgData = e.target.result;
+
+            // Show preview
+            let img = document.createElement("img");
+            img.src = imgData;
+            img.className = "previewImg";
+            document.getElementById("previewBox").appendChild(img);
+
+            // Save to gallery (localStorage)
+            let gallery = JSON.parse(localStorage.getItem("galleryImages")) || [];
+            gallery.push(imgData);
+            localStorage.setItem("galleryImages", JSON.stringify(gallery));
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+
 </script>
 
-
-    </body>
+</body>
 </html>
